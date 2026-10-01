@@ -15,9 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Lowercase image name
-        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -26,7 +23,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: .
-          file: deploy/Dockerfile
+          context: CTF/2026日月盾/决赛
+          file: CTF/2026日月盾/决赛/deploy/Dockerfile
           push: true
-          tags: ${{ env.IMAGE }}:latest
+          tags: ghcr.io/pixelbc/rps-challenge:latest
