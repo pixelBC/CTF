@@ -1,4 +1,4 @@
-name: Build and push challenge image
+name: Build and push challenge images
 
 on:
   push:
@@ -12,6 +12,13 @@ jobs:
       contents: read
       packages: write
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: CTF/2026日月盾/决赛
+            image: rps-challenge
+
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +30,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: CTF/2026日月盾/决赛
-          file: CTF/2026日月盾/决赛/deploy/Dockerfile
+          context: ${{ matrix.dir }}
+          file: ${{ matrix.dir }}/deploy/Dockerfile
           push: true
-          tags: ghcr.io/pixelbc/rps-challenge:latest
+          tags: ghcr.io/pixelbc/${{ matrix.image }}:latest
