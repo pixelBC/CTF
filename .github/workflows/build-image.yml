@@ -1,4 +1,4 @@
-name: Build and push challenge images
+name: Build and push challenge image
 
 on:
   push:
@@ -12,15 +12,11 @@ jobs:
       contents: read
       packages: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - dir: CTF/2026日月盾/决赛
-            image: rps-challenge
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Compute image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
 
       - uses: docker/login-action@v3
         with:
@@ -30,7 +26,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.dir }}
-          file: ${{ matrix.dir }}/deploy/Dockerfile
+          context: .
+          file: deploy/Dockerfile
           push: true
-          tags: ghcr.io/pixelbc/${{ matrix.image }}:latest
+          tags: ${{ env.IMAGE }}:latest
