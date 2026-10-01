@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           - dir: 我的题目/2026日月盾/决赛/剪刀石头布
-            image: rps-challenge
+            image: rock-paper-scissors
 
     steps:
       - uses: actions/checkout@v4
