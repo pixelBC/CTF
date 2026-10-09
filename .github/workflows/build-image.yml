@@ -18,6 +18,8 @@ jobs:
         include:
           - dir: 我的题目/2026日月盾/决赛/剪刀石头布
             image: rock-paper-scissors
+          - dir: 我的题目/2026日月盾/初赛/急急国王
+            image: jijiguowang
 
     steps:
       - uses: actions/checkout@v4
