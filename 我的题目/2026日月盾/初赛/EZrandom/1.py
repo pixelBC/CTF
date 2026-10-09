@@ -1,8 +1,8 @@
 import os
 import time
-import uuid
 
-FLAG = os.environ.get("FLAG", f"C404{uuid.uuid4()}")
+with open("flag.txt", "r") as f:
+    FLAG = f.read().strip()
 
 class LuckyMachine:
     def __init__(self, seed):

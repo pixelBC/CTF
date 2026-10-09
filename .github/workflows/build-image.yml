@@ -20,6 +20,8 @@ jobs:
             image: rock-paper-scissors
           - dir: 我的题目/2026日月盾/初赛/急急国王
             image: jijiguowang
+          - dir: 我的题目/2026日月盾/初赛/EZrandom
+            image: ezrandom
 
     steps:
       - uses: actions/checkout@v4
