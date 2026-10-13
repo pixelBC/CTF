@@ -14,6 +14,29 @@ ghcr.io/pixelbc/ezjail:latest
 docker build -f deploy/Dockerfile -t ezjail:latest .
 ```
 
+### 更新镜像（重要）
+
+镜像 tag 固定用 `:latest`，但 Docker 不会自动重拉已存在的 tag，GZCTF 也不会因为镜像更新
+而替换已经在跑的容器。改了题（或改了 sandbox）之后，按这个顺序刷新，否则选手连到的还是旧容器：
+
+```bash
+# 1) 容器主机上：删掉本地旧镜像，强制重新拉
+docker rmi ghcr.io/pixelbc/ezjail:latest || true
+docker pull ghcr.io/pixelbc/ezjail:latest
+
+# 2) GZCTF 后台：把这道题的动态实例删掉再重建（旧的运行中容器不会自动更新）
+```
+
+验证手上镜像是不是最新一版（镜像里写了构建它的提交号）：
+
+```bash
+docker inspect ghcr.io/pixelbc/ezjail:latest \
+  --format '{{index .Config.Labels "org.opencontainers.image.revision"}}'
+docker inspect ghcr.io/pixelbc/ezjail:latest --format '{{.Created}}'
+```
+
+与本仓库最新一次 Actions 构建的 commit 对不上，就说明服务器上还在用旧镜像。
+
 ## 2. GZCTF 题目配置（动态容器）
 
 题目类型选 **Container / 动态容器**，填入：
