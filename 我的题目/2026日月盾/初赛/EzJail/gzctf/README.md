@@ -67,7 +67,9 @@ Flag 说明：本题给选手 Shell，若把平台 flag 写进容器，选手 `c
 
 GZCTF 侧给每个队伍分配独立容器实例；另外建议在题目容器上限制：
 
-- CPU：`1` 核，内存：`256–512 MB`
+- CPU：`1` 核（上限别低于 0.5 核，后面那半段的解法是 CPU 密集的）
+- 内存：`1024 MB`（后半段标准解法要建 4,826,809 个表项的中间相遇表，64 MB 必 OOM）
+- 存储：`512 MB`（镜像本身磁盘占用约 354 MB）
 - PIDs：`128`（防 fork 炸弹；服务内还有 `RLIMIT_NPROC=64` 与并发会话上限）
 - 运行时长：与比赛时长一致，结束后由 GZCTF 回收实例
 
@@ -78,7 +80,7 @@ docker run --rm \
   --name ezjail-test \
   --cap-drop=ALL \
   --security-opt=no-new-privileges \
-  --pids-limit=128 --memory=512m --cpus=1 \
+  --pids-limit=128 --memory=1024m --cpus=1 \
   --read-only --tmpfs /tmp:rw,size=16m --tmpfs /home/player/work:rw,size=64m,uid=1000,gid=1000 \
   --network=ezjail-net \
   -p 10001:10001 \

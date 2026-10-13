@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "sandbox"))
 from command_policy import CommandPolicy, denied_command  # noqa: E402
 from session import BufferOverflow, LineReader, Session  # noqa: E402
 
-MAX = 256
+MAX = 128
 HARD_CAP = 64 * 1024
 
 
@@ -75,8 +75,8 @@ class LineLimitTest(unittest.TestCase):
         self.assertEqual(reader.read_event(), ("line", b"hello"))
 
     def test_line_split_across_chunks(self):
-        reader = reader_for(b"A" * 100 + b"B" * 50 + b"\n", chunk=7)
-        self.assertEqual(reader.read_event(), ("line", b"A" * 100 + b"B" * 50))
+        reader = reader_for(b"A" * 80 + b"B" * 40 + b"\n", chunk=7)
+        self.assertEqual(reader.read_event(), ("line", b"A" * 80 + b"B" * 40))
 
     def test_overlong_line_does_not_leak_tail(self):
         reader = reader_for(b"A" * 300 + b"\nnext\n")
@@ -104,8 +104,12 @@ class CommandPolicyTest(unittest.TestCase):
     def test_denylist(self):
         self.assertEqual(denied_command("sudo ls"), "sudo")
         self.assertEqual(denied_command("ls | sudo cat"), "sudo")
+        self.assertEqual(denied_command("cat /opt/challenge/challenge.py"), "cat")
+        self.assertEqual(denied_command("find / -name x"), "find")
+        self.assertEqual(denied_command("help"), "help")
         self.assertIsNone(denied_command("ls -la /opt/challenge"))
-        self.assertIsNone(denied_command("cat /opt/challenge/*.py"))
+        self.assertIsNone(
+            denied_command("sed -n '1,60p' /opt/challenge/challenge.py"))
 
     def test_streams_output(self):
         out = bytearray()
@@ -242,9 +246,11 @@ class SessionTest(unittest.TestCase):
         self.assertIn(b"one", out)
         self.assertIn(b"two", out)
 
-    def test_help_and_exit(self):
+    def test_help_is_blocked_and_exit(self):
         self.harness.send(b"help\n")
-        self.assertIn(b"cd", self.harness.drain(until=b"cd"))
+        out = self.harness.drain(until="策略禁止".encode())
+        self.assertIn(b"help", out)
+        self.assertNotIn(b"cd <dir>", out)
         self.harness.send(b"exit\n")
         self.assertIn(b"bye", self.harness.drain(until=b"bye"))
 

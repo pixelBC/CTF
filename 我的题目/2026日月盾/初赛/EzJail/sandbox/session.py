@@ -12,16 +12,7 @@ from command_policy import CommandPolicy
 BANNER = """
   EzJail
   每条输入最多 {max_bytes} 字节
-  输入 help 查看可用指令，输入 exit 断开连接。
-"""
-
-HELP = """可用指令：
-  help                 显示本帮助
-  cd <dir>             切换工作目录（当前会话内保持）
-  exit | quit          断开连接
-  其它（单条最多 {max_bytes} 字节）：
-    ls find cat head tail file wc grep sort uniq od hexdump strings
-    base64 python3 xxd diff sed awk ...（支持管道、重定向、命令替换）
+  输入 exit 断开连接。
 """
 
 
@@ -63,7 +54,7 @@ class Session:
     """一次 nc 连接的完整会话：提示符、内建指令、单条命令执行。"""
 
     def __init__(self, conn, policy=None, home="/home/player", cwd=None,
-                 max_line_bytes=256, buffer_hard_cap=64 * 1024, idle_timeout=600,
+                 max_line_bytes=128, buffer_hard_cap=64 * 1024, idle_timeout=600,
                  command_timeout=60, output_limit=256 * 1024):
         self.conn = conn
         self.policy = policy or CommandPolicy()
@@ -119,9 +110,6 @@ class Session:
             if line in ("exit", "quit"):
                 self.send("bye\n")
                 return
-            if line == "help":
-                self.send(HELP.format(max_bytes=self.max_line_bytes))
-                continue
             if line == "cd" or line.startswith("cd ") or line.startswith("cd\t"):
                 self.send(self.change_dir(line))
                 continue
