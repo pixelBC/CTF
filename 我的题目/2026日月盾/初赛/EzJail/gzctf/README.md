@@ -19,6 +19,17 @@ docker build -f deploy/Dockerfile -t ezjail:latest .
 镜像 tag 固定用 `:latest`，但 Docker 不会自动重拉已存在的 tag，GZCTF 也不会因为镜像更新
 而替换已经在跑的容器。改了题（或改了 sandbox）之后，按这个顺序刷新，否则选手连到的还是旧容器：
 
+每次 CI 构建除了 `:latest` 还会打一个**只在这一次构建出现**的 tag：`sha-<7 位提交号>`。
+如果拿不到题目宿主机的 shell（无法 `docker rmi` / `pull`），就把 GZCTF 题目里的
+容器镜像改成这个 `sha-xxxxxxx` tag——宿主机本地没有这个 tag，只能去 GHCR 拉，
+等于强制刷新一次：
+
+```text
+容器镜像: ghcr.io/pixelbc/ezjail:sha-<最新构建的提交号>
+```
+
+能登宿主机时，用下面的常规流程：
+
 ```bash
 # 1) 容器主机上：删掉本地旧镜像，强制重新拉
 docker rmi ghcr.io/pixelbc/ezjail:latest || true
