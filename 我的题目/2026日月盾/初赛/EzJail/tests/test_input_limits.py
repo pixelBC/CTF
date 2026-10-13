@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "sandbox"))
 from command_policy import CommandPolicy, denied_command  # noqa: E402
 from session import BufferOverflow, LineReader, Session  # noqa: E402
 
-MAX = 40
+MAX = 30
 HARD_CAP = 64 * 1024
 
 
