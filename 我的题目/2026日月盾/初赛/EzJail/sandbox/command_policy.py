@@ -21,7 +21,7 @@ DENY = {
     "sudo", "su", "doas", "mount", "umount", "chroot", "nsenter", "unshare",
     "docker", "podman", "systemctl", "service", "passwd", "useradd", "usermod",
     "groupadd", "reboot", "shutdown", "poweroff", "init", "insmod", "modprobe",
-    "iptables", "ip6tables", "nft", "apt", "apt-get", "dpkg",
+    "iptables", "ip6tables", "nft", "apt", "apt-get", "dpkg","cat","echo","find",
 }
 
 _SEGMENT = re.compile(r"[|;&\n]")
