@@ -10,10 +10,9 @@ import socket
 from command_policy import CommandPolicy
 
 BANNER = """
-  EzJail v1.0  —  受限 Linux 探索环境
-  每条输入最多 {max_bytes} 字节（超出整条丢弃，不截断执行）。
+  EzJail
+  每条输入最多 {max_bytes} 字节
   输入 help 查看可用指令，输入 exit 断开连接。
-
 """
 
 HELP = """可用指令：
