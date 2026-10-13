@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "sandbox"))
 from command_policy import CommandPolicy, denied_command  # noqa: E402
 from session import BufferOverflow, LineReader, Session  # noqa: E402
 
-MAX = 128
+MAX = 40
 HARD_CAP = 64 * 1024
 
 
@@ -75,8 +75,9 @@ class LineLimitTest(unittest.TestCase):
         self.assertEqual(reader.read_event(), ("line", b"hello"))
 
     def test_line_split_across_chunks(self):
-        reader = reader_for(b"A" * 80 + b"B" * 40 + b"\n", chunk=7)
-        self.assertEqual(reader.read_event(), ("line", b"A" * 80 + b"B" * 40))
+        line = b"A" * (MAX // 2) + b"B" * (MAX // 3)
+        reader = reader_for(line + b"\n", chunk=7)
+        self.assertEqual(reader.read_event(), ("line", line))
 
     def test_overlong_line_does_not_leak_tail(self):
         reader = reader_for(b"A" * 300 + b"\nnext\n")
@@ -107,6 +108,8 @@ class CommandPolicyTest(unittest.TestCase):
         self.assertEqual(denied_command("cat /opt/challenge/challenge.py"), "cat")
         self.assertEqual(denied_command("find / -name x"), "find")
         self.assertEqual(denied_command("help"), "help")
+        self.assertEqual(denied_command("python3 -c pass"), "python3")
+        self.assertEqual(denied_command("python -c pass"), "python")
         self.assertIsNone(denied_command("ls -la /opt/challenge"))
         self.assertIsNone(
             denied_command("sed -n '1,60p' /opt/challenge/challenge.py"))
@@ -211,9 +214,10 @@ class SessionTest(unittest.TestCase):
         self.assertIn(b"hello-ezjail", self.harness.drain(until=b"hello-ezjail"))
 
     def test_exactly_max_bytes_is_executed(self):
-        self.assertEqual(len(python_line(MAX - 9)), MAX)
-        self.harness.send(python_line(MAX - 9) + b"\n")
-        self.assertIn(b"A" * 32, self.harness.drain(until=b"AAAAAA"))
+        body = MAX - 9
+        self.assertEqual(len(python_line(body)), MAX)
+        self.harness.send(python_line(body) + b"\n")
+        self.assertIn(b"A" * body, self.harness.drain(until=b"A" * 6))
 
     def test_max_plus_one_is_rejected_then_next_command_runs(self):
         line = python_line(MAX + 1 - 9)

@@ -54,7 +54,7 @@ class Session:
     """一次 nc 连接的完整会话：提示符、内建指令、单条命令执行。"""
 
     def __init__(self, conn, policy=None, home="/home/player", cwd=None,
-                 max_line_bytes=128, buffer_hard_cap=64 * 1024, idle_timeout=600,
+                 max_line_bytes=40, buffer_hard_cap=64 * 1024, idle_timeout=600,
                  command_timeout=60, output_limit=256 * 1024):
         self.conn = conn
         self.policy = policy or CommandPolicy()
