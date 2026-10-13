@@ -75,7 +75,7 @@ nc 127.0.0.1 10001
 
 ## 题目附件
 
-把出题人的 `challenge.py` / `challenge.sage` / `challenge/` 内容放进 `challenge/`，
+本题附件是 `challenge/challenge.py` 与 `challenge/challenge2.py`（分别对应 flag 的前后两半），
 构建时原样复制到容器 `/opt/challenge/`（root 所有、目录 555、文件 444，选手可读不可改）。
 选手需要通过 `ls` / `find` / `cat` 自行探索，登录信息中不公布附件路径。
 

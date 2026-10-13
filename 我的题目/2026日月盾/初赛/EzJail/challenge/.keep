@@ -1,2 +1,0 @@
-# 把出题人提供的题目附件（challenge.py / challenge.sage / challenge/ 内的文件）
-# 放在本目录，构建时会原样部署到容器内的 /opt/challenge/。
