@@ -1,10 +1,13 @@
 #!/bin/sh
 set -e
 
-# 题目附件保持只读：选手可读、可探索，但不能篡改
-chown -R root:root /opt/challenge
-find /opt/challenge -type d -exec chmod 555 {} +
-find /opt/challenge -type f -exec chmod 444 {} +
+# 题目附件分两处存放，都保持只读：选手可读、可探索，但不能篡改
+for d in /opt/challenge /srv/backup; do
+    [ -d "$d" ] || continue
+    chown -R root:root "$d"
+    find "$d" -type d -exec chmod 555 {} +
+    find "$d" -type f -exec chmod 444 {} +
+done
 
 # 可选：把平台注入的 flag 写进容器（默认关闭）。
 # 本题会给选手一个 Shell，容器内的 flag 文件会被直接读到，

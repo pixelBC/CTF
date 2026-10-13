@@ -1,8 +1,7 @@
 # EzJail
 
 一个「受限 Linux 探索环境」型题目容器：`nc` 连接后进入自定义的受限 Shell，
-可以用常见 Linux 指令探索文件系统、找到出题人放在 `/opt/challenge/` 的附件，
-在允许的范围内运行程序解题。
+可以用允许的 Linux 指令探索文件系统、找到分散在两处的题目附件，在允许的范围内运行程序解题。
 
 服务端对**每次输入的单条命令**实施字节上限（默认 256 字节），先校验后执行，
 超长输入整条丢弃，不会被截断后继续执行。
@@ -20,7 +19,7 @@ EzJail/
 │   ├── server.py           # TCP 会话服务器（每连接 fork 子进程）
 │   ├── session.py          # 按字节读取 + 单行上限 + 提示符/内建指令
 │   └── command_policy.py   # 粗粒度黑名单 + rlimit + 超时 + 输出上限
-├── challenge/              # 出题人附件：构建时原样落到容器 /opt/challenge/
+├── challenge/              # 出题人附件：构建时落到容器两个不同目录（见下）
 ├── tests/
 │   └── test_input_limits.py
 └── gzctf/
@@ -73,14 +72,35 @@ nc 127.0.0.1 10001
   只有 `cd` 会在会话内保持当前目录；`vim`、`less` 这类需要终端的全屏程序不可用。
 - 换来的好处：单行字节上限真实生效、输出与超时可控、会话之间互不影响。
 
-## 题目附件
+## 容器内目录（真实沙箱）
 
-本题附件是 `challenge/challenge.py` 与 `challenge/challenge2.py`（分别对应 flag 的前后两半），
-构建时原样复制到容器 `/opt/challenge/`（root 所有、目录 555、文件 444，选手可读不可改）。
-选手需要通过 `ls` / `find` / `cat` 自行探索，登录信息中不公布附件路径。
+```
+/
+├── opt/
+│   ├── challenge/challenge.py      附件一    root:root 444，目录 555
+│   └── ezjail/{server.py,session.py,command_policy.py}   会话服务本体
+├── srv/
+│   └── backup/challenge2.py        附件二    root:root 444，目录 555
+├── home/player/work/               选手唯一可写目录（正式部署用 tmpfs）
+├── usr/local/bin/ezjail-entrypoint 入口脚本
+└── flag                            仅当 EZJAIL_INJECT_FLAG=1 时存在（400）
+```
+
+两个附件分别对应 flag 的前后两半，由 `deploy/Dockerfile` 的 COPY 落到
+`/opt/challenge/` 与 `/srv/backup/`，登录信息中不公布任何路径，需要选手自行探索。
 
 若附件依赖 SageMath：把 `deploy/Dockerfile` 的基础镜像换成 `sagemath/sagemath`，
 其余（`sandbox/`、`challenge/` 的复制与启动方式）保持不变。
+
+## 命令策略（黑名单）
+
+`sandbox/command_policy.py` 的 `DENY` 集合按「每段命令的首个 token」拦下指令，
+当前包含 `sudo/su/mount/chroot/nsenter/unshare/docker/systemctl/passwd/...`
+以及 `cat`、`echo`、`find`。
+
+这只是抬高门槛，**不是安全边界**：`sed`、`awk`、`head`、`grep -r`、`python3 -c`、
+`bash -c '...'`、管道与 for 循环体都不受该黑名单限制，任何一条都能达到同样效果。
+需要真正限制能执行什么，应改用白名单执行器。
 
 ## 测试
 

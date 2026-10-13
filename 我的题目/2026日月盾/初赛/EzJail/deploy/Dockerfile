@@ -13,7 +13,8 @@ RUN apt-get update \
     && useradd -m -u 1000 -s /bin/bash player
 
 COPY sandbox/ /opt/ezjail/
-COPY challenge/ /opt/challenge/
+COPY challenge/challenge.py /opt/challenge/challenge.py
+COPY challenge/challenge2.py /srv/backup/challenge2.py
 COPY deploy/entrypoint.sh /usr/local/bin/ezjail-entrypoint
 RUN chmod 755 /usr/local/bin/ezjail-entrypoint \
     && mkdir -p /home/player/work \
