@@ -24,6 +24,8 @@ jobs:
             image: ezrandom
           - dir: 我的题目/2026日月盾/初赛/EzJail
             image: ezjail
+          - dir: 我的题目/2026日月盾/初赛/mmdd55
+            image: mmdd55
 
     steps:
       - uses: actions/checkout@v4
