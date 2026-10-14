@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    MAX_LINE_BYTES=30 \
+    MAX_LINE_BYTES=12 \
     EZJAIL_PORT=10001
 
 RUN apt-get update \

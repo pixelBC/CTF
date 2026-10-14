@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "sandbox"))
 from command_policy import CommandPolicy, denied_command  # noqa: E402
 from session import BufferOverflow, LineReader, Session  # noqa: E402
 
-MAX = 30
+MAX = 12
 HARD_CAP = 64 * 1024
 
 
@@ -210,39 +210,39 @@ class SessionTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_banner_and_simple_command(self):
-        self.harness.send(b'print("hello-ezjail")\n')
-        self.assertIn(b"hello-ezjail", self.harness.drain(until=b"hello-ezjail"))
+        self.harness.send(b'print("hi")\n')
+        self.assertIn(b"hi", self.harness.drain(until=b"hi"))
 
     def test_exactly_max_bytes_is_executed(self):
         body = MAX - 9
         self.assertEqual(len(python_line(body)), MAX)
         self.harness.send(python_line(body) + b"\n")
-        self.assertIn(b"A" * body, self.harness.drain(until=b"A" * 6))
+        self.assertIn(b"A" * body, self.harness.drain(until=b"A" * body))
 
     def test_max_plus_one_is_rejected_then_next_command_runs(self):
         line = python_line(MAX + 1 - 9)
         self.assertEqual(len(line), MAX + 1)
         self.harness.send(line + b"\n")
         self.assertIn("整条丢弃".encode(), self.harness.drain(until="整条丢弃".encode()))
-        self.harness.send(b'print("after-overlong")\n')
-        self.assertIn(b"after-overlong", self.harness.drain(until=b"after-overlong"))
+        self.harness.send(b'print("ok")\n')
+        self.assertIn(b"ok", self.harness.drain(until=b"ok"))
 
     def test_overlong_tail_is_not_executed(self):
         self.harness.send(b"A" * 292 + b'print("BOOM")' + b"\n")
         out = self.harness.drain(until="整条丢弃".encode())
         self.assertNotIn(b"BOOM", out)
-        self.harness.send(b'print("still-alive")\n')
-        self.assertIn(b"still-alive", self.harness.drain(until=b"still-alive"))
+        self.harness.send(b'print("QQ")\n')
+        self.assertIn(b"QQ", self.harness.drain(until=b"QQ"))
 
     def test_crlf_terminated_command(self):
-        self.harness.send(b'print("crlf-ok")\r\n')
-        self.assertIn(b"crlf-ok", self.harness.drain(until=b"crlf-ok"))
+        self.harness.send(b'print("Xy")\r\n')
+        self.assertIn(b"Xy", self.harness.drain(until=b"Xy"))
 
     def test_empty_line_then_command(self):
         self.harness.send(b"\n")
         self.harness.drain()
-        self.harness.send(b'print("after-empty")\n')
-        self.assertIn(b"after-empty", self.harness.drain(until=b"after-empty"))
+        self.harness.send(b'print("zq")\n')
+        self.assertIn(b"zq", self.harness.drain(until=b"zq"))
 
     def test_multiple_commands_in_one_send(self):
         self.harness.send(b'print("one")\nprint("two")\n')
