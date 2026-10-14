@@ -10,9 +10,8 @@ import socket
 from command_policy import CommandPolicy
 
 BANNER = """
-  EzJail
-  每条输入最多 {max_bytes} 字节
-  输入 exit 断开连接。
+Welcome to EzJail
+每条输入最多 {max_bytes} 字节,输入 exit 断开连接。
 """
 
 
