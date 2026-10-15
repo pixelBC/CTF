@@ -26,6 +26,8 @@ jobs:
             image: ezjail
           - dir: 我的题目/2026日月盾/初赛/mmdd55
             image: mmdd55
+          - dir: 我的题目/2026日月盾/初赛/无边的黑暗のRevenge
+            image: wubiandeheian
 
     steps:
       - uses: actions/checkout@v4
