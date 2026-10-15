@@ -54,7 +54,7 @@ def handle(conn, addr):
         conn.sendall((BANNER + '\n\n').encode())
         if EOF_LINE:
             time.sleep(EOF_DELAY)
-            conn.sendall((EOF_LINE + '\n\n').encode())      # 坑：假报错
+            conn.sendall((EOF_LINE + '\n').encode())        # 坑：假报错（行尾不带空行）
         log('连接 %s：已问候%s，等 %.0f 秒' % (peer, ' + 假 EOF' if EOF_LINE else '', DELAY))
         time.sleep(max(0.0, DELAY - (time.time() - t0)))     # DELAY 从连接时刻算起
         url = load_url()
